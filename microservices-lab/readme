@@ -1,0 +1,279 @@
+# Microservices Lab – Node.js + Docker
+
+## Overview
+
+This project implements a **Microservices Architecture** using **Node.js, Express, Docker, and Docker Compose**.
+
+The system consists of four independent services:
+
+* **Item Service** – manages items
+* **Order Service** – manages customer orders
+* **Payment Service** – processes payments
+* **API Gateway** – routes all incoming requests
+
+All services run in **separate Docker containers** and communicate through the **API Gateway**.
+
+---
+
+# System Architecture
+
+Client → API Gateway (Port 8080)
+
+The gateway routes requests to:
+
+| Service         | Port |
+| --------------- | ---- |
+| Item Service    | 8081 |
+| Order Service   | 8082 |
+| Payment Service | 8083 |
+
+All services run inside the same Docker network.
+
+---
+
+# Project Structure
+
+```
+microservices-lab
+│
+├── api-gateway
+│   ├── index.js
+│   └── Dockerfile
+│
+├── item-service
+│   ├── index.js
+│   └── Dockerfile
+│
+├── order-service
+│   ├── index.js
+│   └── Dockerfile
+│
+├── payment-service
+│   ├── index.js
+│   └── Dockerfile
+│
+└── docker-compose.yml
+```
+
+---
+
+# Technologies Used
+
+* Node.js
+* Express.js
+* Docker
+* Docker Compose
+* Postman / curl
+
+---
+
+# Running the Project
+
+## Build Containers
+
+```bash
+docker-compose build
+```
+
+## Start Containers
+
+```bash
+docker-compose up
+```
+
+Run in background:
+
+```bash
+docker-compose up -d
+```
+
+## Check Running Containers
+
+```bash
+docker ps
+```
+
+---
+
+# API Gateway
+
+All API requests go through:
+
+```
+http://localhost:8080
+```
+
+Routing rules:
+
+| Gateway Endpoint | Service         |
+| ---------------- | --------------- |
+| /items           | Item Service    |
+| /orders          | Order Service   |
+| /payments        | Payment Service |
+
+---
+
+# API Testing (curl Commands)
+
+Below are the curl commands used to test the APIs.
+
+---
+
+# Item Service
+
+## Get All Items
+
+```bash
+curl -X GET http://localhost:8080/items
+```
+
+Example Response:
+
+```
+[
+ { "id":0,"name":"Book"},
+ { "id":1,"name":"Laptop"},
+ { "id":2,"name":"Phone"}
+]
+```
+
+---
+
+## Create Item
+
+```bash
+curl -X POST http://localhost:8080/items \
+-H "Content-Type: application/json" \
+-d '{"name":"Headphones"}'
+```
+
+---
+
+## Get Item by ID
+
+```bash
+curl -X GET http://localhost:8080/items/0
+```
+
+---
+
+# Order Service
+
+## Get All Orders
+
+```bash
+curl -X GET http://localhost:8080/orders
+```
+
+---
+
+## Place Order
+
+```bash
+curl -X POST http://localhost:8080/orders \
+-H "Content-Type: application/json" \
+-d '{
+"item":"Laptop",
+"quantity":2,
+"customerId":"C001"
+}'
+```
+
+Example Response
+
+```
+{
+"id":1,
+"item":"Laptop",
+"quantity":2,
+"customerId":"C001",
+"status":"PENDING"
+}
+```
+
+---
+
+## Get Order by ID
+
+```bash
+curl -X GET http://localhost:8080/orders/1
+```
+
+---
+
+# Payment Service
+
+## Get All Payments
+
+```bash
+curl -X GET http://localhost:8080/payments
+```
+
+---
+
+## Process Payment
+
+```bash
+curl -X POST http://localhost:8080/payments/process \
+-H "Content-Type: application/json" \
+-d '{
+"orderId":1,
+"amount":1299.99,
+"method":"CARD"
+}'
+```
+
+Example Response
+
+```
+{
+"id":1,
+"orderId":1,
+"amount":1299.99,
+"method":"CARD",
+"status":"SUCCESS"
+}
+```
+
+---
+
+## Get Payment by ID
+
+```bash
+curl -X GET http://localhost:8080/payments/1
+```
+
+---
+
+# Testing with Postman
+
+1. Open **Postman**
+2. Create a collection named **Microservices Lab**
+3. Add requests for all endpoints
+4. Use the API Gateway URL
+
+Example:
+
+```
+GET http://localhost:8080/items
+POST http://localhost:8080/orders
+POST http://localhost:8080/payments/process
+```
+
+---
+
+# Stopping the Containers
+
+```bash
+docker-compose down
+```
+
+---
+
+# Author
+
+Reg: IT22351654
+Module: Current Trends in Software Engineering (SE4010)
+Lab: Microservices – Build, Dockerize, Deploy, Test
+
+---
